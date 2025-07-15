@@ -65,7 +65,6 @@ function Scene() {
           color="#EF4444"
           anchorX="center"
           anchorY="middle"
-          font="/fonts/inter-bold.woff"
         >
           🎯
         </Text>
@@ -78,7 +77,6 @@ function Scene() {
           color="#10B981"
           anchorX="center"
           anchorY="middle"
-          font="/fonts/inter-bold.woff"
         >
           🚀
         </Text>

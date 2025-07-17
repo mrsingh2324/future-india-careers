@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Star, Users, Target } from 'lucide-react';
-import Hero3D from './Hero3D';
+import { ArrowRight, Star, Users, Target, Sparkles, TrendingUp, Zap } from 'lucide-react';
 
 const stats = [
   { icon: Users, value: '50K+', label: 'Students Guided' },
@@ -79,23 +78,139 @@ export default function HeroSection() {
             </motion.div>
           </div>
 
-          {/* Right Content - 3D Scene */}
+          {/* Right Content - Interactive Visual */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 1, delay: 0.3 }}
             className="relative"
           >
-            <Hero3D />
+            {/* Main Visual Container */}
+            <div className="relative w-full h-[500px] rounded-2xl bg-gradient-to-br from-primary/20 via-secondary/20 to-accent/20 backdrop-blur-sm border border-white/10 overflow-hidden">
+              {/* Animated Background Elements */}
+              <div className="absolute inset-0">
+                <motion.div
+                  className="absolute top-20 left-20 w-32 h-32 bg-primary/30 rounded-full blur-xl"
+                  animate={{ 
+                    y: [0, -20, 0],
+                    scale: [1, 1.1, 1]
+                  }}
+                  transition={{ 
+                    duration: 4, 
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                />
+                <motion.div
+                  className="absolute bottom-20 right-20 w-40 h-40 bg-secondary/30 rounded-full blur-xl"
+                  animate={{ 
+                    y: [0, 20, 0],
+                    scale: [1, 0.9, 1]
+                  }}
+                  transition={{ 
+                    duration: 3, 
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: 1
+                  }}
+                />
+                <motion.div
+                  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-accent/20 rounded-full blur-xl"
+                  animate={{ 
+                    rotate: [0, 360],
+                    scale: [1, 1.2, 1]
+                  }}
+                  transition={{ 
+                    duration: 8, 
+                    repeat: Infinity,
+                    ease: "linear"
+                  }}
+                />
+              </div>
+
+              {/* Central Icon */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <motion.div
+                  className="relative"
+                  animate={{ 
+                    y: [0, -10, 0],
+                    rotate: [0, 5, -5, 0]
+                  }}
+                  transition={{ 
+                    duration: 3, 
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                >
+                  <div className="w-32 h-32 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-6xl shadow-2xl">
+                    🎯
+                  </div>
+                  <motion.div
+                    className="absolute -top-2 -right-2 w-8 h-8 bg-accent rounded-full flex items-center justify-center"
+                    animate={{ 
+                      scale: [1, 1.3, 1],
+                    }}
+                    transition={{ 
+                      duration: 2, 
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                      delay: 0.5
+                    }}
+                  >
+                    <Sparkles className="w-4 h-4 text-white" />
+                  </motion.div>
+                </motion.div>
+              </div>
+
+              {/* Floating Elements */}
+              <motion.div
+                className="absolute top-16 right-16"
+                animate={{ 
+                  y: [0, -15, 0],
+                  rotate: [0, 10, -10, 0]
+                }}
+                transition={{ 
+                  duration: 2.5, 
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 0.8
+                }}
+              >
+                <div className="w-16 h-16 bg-gradient-to-br from-accent to-primary/80 rounded-xl flex items-center justify-center text-2xl shadow-lg">
+                  🚀
+                </div>
+              </motion.div>
+
+              <motion.div
+                className="absolute bottom-16 left-16"
+                animate={{ 
+                  y: [0, 15, 0],
+                  x: [0, 10, 0]
+                }}
+                transition={{ 
+                  duration: 3.5, 
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 1.2
+                }}
+              >
+                <div className="w-12 h-12 bg-gradient-to-br from-secondary to-accent/80 rounded-full flex items-center justify-center text-xl shadow-lg">
+                  💡
+                </div>
+              </motion.div>
+            </div>
             
-            {/* Floating Cards */}
+            {/* Floating Career Cards */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.8 }}
               className="absolute -top-4 -left-4 glass-card p-4 floating-element"
             >
-              <div className="text-primary font-semibold">Engineering</div>
+              <div className="flex items-center gap-2">
+                <TrendingUp className="w-4 h-4 text-primary" />
+                <div className="text-primary font-semibold">Engineering</div>
+              </div>
               <div className="text-sm text-muted-foreground">₹8-25 LPA</div>
             </motion.div>
             
@@ -105,7 +220,10 @@ export default function HeroSection() {
               transition={{ duration: 0.8, delay: 1 }}
               className="absolute -bottom-4 -right-4 glass-card p-4 floating-element"
             >
-              <div className="text-secondary font-semibold">Medical</div>
+              <div className="flex items-center gap-2">
+                <Zap className="w-4 h-4 text-secondary" />
+                <div className="text-secondary font-semibold">Medical</div>
+              </div>
               <div className="text-sm text-muted-foreground">₹10-50 LPA</div>
             </motion.div>
             
@@ -115,7 +233,10 @@ export default function HeroSection() {
               transition={{ duration: 0.8, delay: 1.2 }}
               className="absolute top-1/2 -right-8 glass-card p-4 floating-element"
             >
-              <div className="text-accent font-semibold">Business</div>
+              <div className="flex items-center gap-2">
+                <Star className="w-4 h-4 text-accent" />
+                <div className="text-accent font-semibold">Business</div>
+              </div>
               <div className="text-sm text-muted-foreground">₹6-30 LPA</div>
             </motion.div>
           </motion.div>

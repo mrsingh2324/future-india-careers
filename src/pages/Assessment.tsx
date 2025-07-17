@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAssessmentStore } from '@/store/useAssessmentStore';
+import { useAIAssessment } from '@/hooks/useAIAssessment';
 import { ChevronLeft, ChevronRight, CheckCircle } from 'lucide-react';
 
 const questions = [

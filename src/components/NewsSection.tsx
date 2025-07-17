@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion';
-import { Calendar, ExternalLink, TrendingUp } from 'lucide-react';
+import { Calendar, ExternalLink, TrendingUp, Loader, RefreshCw } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
 
 interface NewsItem {
   id: string;
@@ -9,59 +11,48 @@ interface NewsItem {
   publishedAt: string;
   source: string;
   url: string;
-  category: 'tech' | 'ai' | 'economy' | 'research';
+  category: string;
+  imageUrl?: string;
 }
 
-// Mock news data - in real app, this would come from your API
-const mockNews: NewsItem[] = [
-  {
-    id: '1',
-    title: 'AI Revolution in Education: How Machine Learning is Transforming Career Guidance',
-    description: 'Latest developments in AI-powered career counseling and its impact on student decision-making processes.',
-    publishedAt: '2024-01-15T10:00:00Z',
-    source: 'Tech Today',
-    url: '#',
-    category: 'ai'
-  },
-  {
-    id: '2',
-    title: 'Indian IT Sector Shows 15% Growth in 2024: New Opportunities for Engineering Graduates',
-    description: 'The tech industry continues to expand, creating thousands of new jobs for skilled professionals.',
-    publishedAt: '2024-01-14T14:30:00Z',
-    source: 'Economic Times',
-    url: '#',
-    category: 'economy'
-  },
-  {
-    id: '3',
-    title: 'Breakthrough Research in Quantum Computing Opens New Career Paths',
-    description: 'Scientists achieve major milestone in quantum computing, creating demand for specialized professionals.',
-    publishedAt: '2024-01-13T09:15:00Z',
-    source: 'Science Daily',
-    url: '#',
-    category: 'research'
-  },
-  {
-    id: '4',
-    title: 'Future of Work: Remote Jobs Expected to Increase by 40% in Next 5 Years',
-    description: 'Study reveals changing work patterns and their impact on career planning for students.',
-    publishedAt: '2024-01-12T16:45:00Z',
-    source: 'Future Work',
-    url: '#',
-    category: 'tech'
-  }
-];
-
-const categoryColors = {
-  tech: 'bg-blue-100 text-blue-800',
-  ai: 'bg-purple-100 text-purple-800',
-  economy: 'bg-green-100 text-green-800',
-  research: 'bg-orange-100 text-orange-800'
+const categoryColors: Record<string, string> = {
+  Technology: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
+  Business: 'bg-green-500/20 text-green-300 border-green-500/30',
+  Environment: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+  Education: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+  Health: 'bg-pink-500/20 text-pink-300 border-pink-500/30',
+  Economy: 'bg-orange-500/20 text-orange-300 border-orange-500/30',
+  Career: 'bg-primary/20 text-primary border-primary/30',
 };
 
 export default function NewsSection() {
-  const [news, setNews] = useState<NewsItem[]>(mockNews);
-  const [loading, setLoading] = useState(false);
+  const [news, setNews] = useState<NewsItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchLiveNews();
+  }, []);
+
+  const fetchLiveNews = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const { data, error } = await supabase.functions.invoke('fetch-news');
+      
+      if (error) throw error;
+      
+      if (data?.news) {
+        setNews(data.news);
+      }
+    } catch (err: any) {
+      console.error('Error fetching news:', err);
+      setError('Failed to load latest news. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-IN', {
@@ -90,8 +81,17 @@ export default function NewsSection() {
         </motion.div>
 
         {loading ? (
-          <div className="flex justify-center items-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          <div className="flex flex-col justify-center items-center py-20">
+            <Loader className="animate-spin h-12 w-12 text-primary mb-4" />
+            <p className="text-muted-foreground">Loading latest career news...</p>
+          </div>
+        ) : error ? (
+          <div className="flex flex-col justify-center items-center py-20">
+            <p className="text-destructive mb-4">{error}</p>
+            <Button onClick={fetchLiveNews} variant="outline" className="flex items-center gap-2">
+              <RefreshCw className="h-4 w-4" />
+              Try Again
+            </Button>
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
@@ -102,37 +102,54 @@ export default function NewsSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: index * 0.2 }}
                 viewport={{ once: true }}
-                className="card-elevated group hover:shadow-2xl transition-all duration-300"
+                className="group relative overflow-hidden bg-gradient-card border border-border rounded-xl hover:shadow-glow transition-all duration-500"
               >
-                <div className="flex items-start justify-between mb-4">
-                  <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${categoryColors[item.category]}`}>
-                    {item.category.toUpperCase()}
-                  </span>
-                  <TrendingUp className="w-5 h-5 text-muted-foreground" />
-                </div>
-
-                <h3 className="text-xl font-semibold mb-3 group-hover:text-primary transition-colors">
-                  {item.title}
-                </h3>
-
-                <p className="text-muted-foreground mb-4 line-clamp-3">
-                  {item.description}
-                </p>
-
-                <div className="flex items-center justify-between pt-4 border-t border-border">
-                  <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                    <div className="flex items-center">
-                      <Calendar className="w-4 h-4 mr-1" />
-                      {formatDate(item.publishedAt)}
-                    </div>
-                    <span>•</span>
-                    <span>{item.source}</span>
+                {item.imageUrl && (
+                  <div className="aspect-video overflow-hidden">
+                    <img 
+                      src={item.imageUrl} 
+                      alt={item.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </div>
+                )}
+                
+                <div className="p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium border ${categoryColors[item.category] || categoryColors.Career}`}>
+                      {item.category.toUpperCase()}
+                    </span>
+                    <TrendingUp className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
                   </div>
 
-                  <button className="inline-flex items-center text-primary hover:text-primary-dark transition-colors">
-                    <span className="text-sm font-medium">Read More</span>
-                    <ExternalLink className="w-4 h-4 ml-1" />
-                  </button>
+                  <h3 className="text-xl font-semibold mb-3 group-hover:text-primary transition-colors line-clamp-2">
+                    {item.title}
+                  </h3>
+
+                  <p className="text-muted-foreground mb-4 line-clamp-3">
+                    {item.description}
+                  </p>
+
+                  <div className="flex items-center justify-between pt-4 border-t border-border">
+                    <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                      <div className="flex items-center">
+                        <Calendar className="w-4 h-4 mr-1" />
+                        {formatDate(item.publishedAt)}
+                      </div>
+                      <span>•</span>
+                      <span className="truncate max-w-[100px]">{item.source}</span>
+                    </div>
+
+                    <a 
+                      href={item.url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center text-primary hover:text-primary-light transition-colors group/link"
+                    >
+                      <span className="text-sm font-medium">Read More</span>
+                      <ExternalLink className="w-4 h-4 ml-1 group-hover/link:translate-x-1 transition-transform" />
+                    </a>
+                  </div>
                 </div>
               </motion.article>
             ))}
@@ -144,11 +161,19 @@ export default function NewsSection() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.8 }}
           viewport={{ once: true }}
-          className="text-center mt-16"
+          className="text-center mt-16 space-y-4"
         >
-          <button className="btn-outline">
+          <Button 
+            onClick={fetchLiveNews}
+            className="bg-gradient-primary hover:shadow-glow transition-all duration-300 mr-4"
+            disabled={loading}
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            Refresh News
+          </Button>
+          <Button variant="outline" className="btn-outline">
             View All News
-          </button>
+          </Button>
         </motion.div>
       </div>
     </section>
